@@ -1,0 +1,60 @@
+<div class="form-container">
+    <div class="tabs">
+        <div id="user-tab" class="tab active" onclick="switchTab('user')">User</div>
+        <div id="admin-tab" class="tab" onclick="switchTab('admin')">Admin</div>
+    </div>
+
+    <div id="login-form">
+        <h3 id="form-title">User Login</h3>
+        
+        <label>Select Name:</label>
+        <select id="name-dropdown">
+            <option value="">-- Choose Name --</option>
+        </select>
+        
+        <label>Enter PIN:</label>
+        <input type="password" id="pin-input" maxlength="4" placeholder="****">
+        
+        <button onclick="handleLogin()">Sign In</button>
+    </div>
+</div>
+
+<script>
+    let currentRole = 'user';
+
+    function switchTab(role) {
+        currentRole = role;
+        document.getElementById('form-title').innerText = role === 'user' ? 'User Login' : 'Admin Login';
+        document.getElementById('user-tab').className = role === 'user' ? 'tab active' : 'tab';
+        document.getElementById('admin-tab').className = role === 'admin' ? 'tab active' : 'tab';
+        loadNames(); // Refresh dropdown for the specific role
+    }
+
+    async function loadNames() {
+        const res = await fetch(`/api/names?role=${currentRole}`);
+        const names = await res.json();
+        const dropdown = document.getElementById('name-dropdown');
+        dropdown.innerHTML = '<option value="">-- Choose Name --</option>' + 
+            names.map(n => `<option value="${n.full_name}">${n.full_name}</option>`).join('');
+    }
+
+    async function handleLogin() {
+        const fullName = document.getElementById('name-dropdown').value;
+        const pin = document.getElementById('pin-input').value;
+
+        const res = await fetch('/api/login', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ fullName, pin, role: currentRole })
+        });
+
+        const result = await res.json();
+        if (result.success) {
+            window.location.href = currentRole === 'admin' ? '/admin-dashboard' : '/user-home';
+        } else {
+            alert("Invalid PIN or Name");
+        }
+    }
+
+    window.onload = loadNames;
+</script>
