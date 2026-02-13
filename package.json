@@ -1,0 +1,16 @@
+{
+  "name": "unit-manager-api",
+  "version": "1.0.0",
+  "description": "Unit Manager Backend API for Vercel",
+  "main": "api/index.js",
+  "scripts": {
+    "dev": "vercel dev",
+    "deploy": "vercel --prod"
+  },
+  "dependencies": {
+    "pg": "^8.11.3"
+  },
+  "engines": {
+    "node": ">=18.x"
+  }
+}
